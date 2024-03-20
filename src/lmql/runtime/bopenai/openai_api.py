@@ -147,9 +147,12 @@ def get_azure_config(model, api_config):
     return None
 
 def get_endpoint_and_headers(kwargs):
+    from lmql.runtime.openai_secret import openai_secret, openai_org
+
     model = kwargs["model"]
     api_config = kwargs.pop("api_config", {})
     endpoint = api_config.get("endpoint", None)
+    secret = api_config.get("secret", f"Bearer {openai_secret}")
 
     # try to get azure config from endpoint or env
     azure_config = get_azure_config(model, api_config)
@@ -161,11 +164,11 @@ def get_endpoint_and_headers(kwargs):
         if not endpoint.startswith("http"):
             endpoint = f"http://{endpoint}"
         return endpoint, {
+            "Authorization": secret,
             "Content-Type": "application/json"
         }
     
     # use standard public API config
-    from lmql.runtime.openai_secret import openai_secret, openai_org
     headers = {
         "Authorization": f"Bearer {openai_secret}",
         "Content-Type": "application/json",

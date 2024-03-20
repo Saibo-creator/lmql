@@ -49,6 +49,27 @@ For system-wide configuration, you can also create an `api.env` file at `$HOME/.
 
 Lastly, you can also use LMQL-specific environment variables `LMQL_OPENAI_SECRET` and `LMQL_OPENAI_ORG`, which take precedence over the `OPENAI_API_KEY` environment variable.
 
+### Proxy Configuration
+
+If you need to use a proxy to access the OpenAI API, you can set the proxy via `endpoint` variable when creating the model:
+
+```python
+import lmql
+
+# uses 'chatgpt' by default
+@lmql.query(model="chatgpt")
+def tell_a_joke():
+    '''lmql
+    """A great good dad joke. A indicates the punchline
+    Q:[JOKE]
+    A:[PUNCHLINE]""" where STOPS_AT(JOKE, "?") and \
+                           STOPS_AT(PUNCHLINE, "\n")
+    '''
+
+tell_a_joke(model=lmql.model("openai/gpt-4", endpoint="https://api.openai-proxy.com/v1/chat/completions")) #using a proxy  https://api.openai-proxy.com which provide the same API as openai, this reuse the same secret as the openai one 
+tell_a_joke(model=lmql.model("openai/gpt-4", endpoint="http://localhost:8080/v1/chat/completions", secret= "your_secret")) #using a local proxy with a different secret than the openai one
+```
+
 ## Monitoring OpenAI API use
 
 When working with OpenAI models, it is important to keep track of your API usage. LMQL offers a couple of ways to see what is happening internally and how many API calls are being made.
